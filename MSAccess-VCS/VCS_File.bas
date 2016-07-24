@@ -198,59 +198,14 @@ End Sub
 ' Determine if this database imports/exports code as UCS-2-LE. (Older file
 ' formats cause exported objects to use a Windows 8-bit character set.)
 Public Function VCS_UsingUcs2() As Boolean
-    Dim obj_name As String
-    Dim obj_type As Variant
-    Dim fn As Integer
-    Dim bytes As String
-    Dim obj_type_split() As String
-    Dim obj_type_name As String
-    Dim obj_type_num As Integer
-    
-    If CurrentDb.QueryDefs.Count > 0 Then
-        obj_type_num = acQuery
-        obj_name = CurrentDb.QueryDefs(0).name
-    Else
-        For Each obj_type In Split( _
-            "Forms|" & acForm & "," & _
-            "Reports|" & acReport & "," & _
-            "Scripts|" & acMacro & "," & _
-            "Modules|" & acModule _
-        )
-            DoEvents
-            obj_type_split = Split(obj_type, "|")
-            obj_type_name = obj_type_split(0)
-            obj_type_num = Val(obj_type_split(1))
-            If CurrentDb.Containers(obj_type_name).Documents.Count > 0 Then
-                obj_name = CurrentDb.Containers(obj_type_name).Documents(0).name
-                Exit For
-            End If
-        Next
-    End If
-
-    If obj_name = vbNullString Then
-        ' No objects found that can be used to test UCS2 versus UTF-8
-        VCS_UsingUcs2 = True
-        Exit Function
-    End If
-
-    Dim tempFileName As String
-    tempFileName = VCS_File.VCS_TempFile()
-    
-    Application.SaveAsText obj_type_num, obj_name, tempFileName
-    fn = FreeFile
-    Open tempFileName For Binary Access Read As fn
-    bytes = "  "
-    Get fn, 1, bytes
-    If Asc(Mid$(bytes, 1, 1)) = &HFF And Asc(Mid$(bytes, 2, 1)) = &HFE Then
-        VCS_UsingUcs2 = True
-    Else
-        VCS_UsingUcs2 = False
-    End If
-    Close fn
-    
-    Dim FSO As Object
-    Set FSO = CreateObject("Scripting.FileSystemObject")
-    FSO.DeleteFile (tempFileName)
+    Select Case CurrentProject.FileFormat
+        Case acFileFormatAccess97, acFileFormatAccess2000, acFileFormatAccess2002
+            VCS_UsingUcs2 = False
+        Case 12 ' acFileFormatAccess12; ' For Access 2003 and earlier
+            VCS_UsingUcs2 = True
+        Case Else
+            VCS_UsingUcs2 = True
+    End Select
 End Function
 
 ' Generate Random / Unique tempprary file name.
