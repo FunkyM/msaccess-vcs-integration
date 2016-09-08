@@ -26,26 +26,26 @@ Public Sub VCS_ExportLinkedTable(ByVal tbl_name As String, ByVal obj_path As Str
     
     OutFile.Write CurrentDb.TableDefs(tbl_name).name
     OutFile.Write vbCrLf
-    
+
     If InStr(1, CurrentDb.TableDefs(tbl_name).connect, "DATABASE=" & CurrentProject.Path) Then
-        'change to relatave path
+        ' Change to relative path
         Dim connect() As String
         connect = Split(CurrentDb.TableDefs(tbl_name).connect, CurrentProject.Path)
         OutFile.Write connect(0) & "." & connect(1)
     Else
         OutFile.Write CurrentDb.TableDefs(tbl_name).connect
     End If
-    
+
     OutFile.Write vbCrLf
     OutFile.Write CurrentDb.TableDefs(tbl_name).SourceTableName
     OutFile.Write vbCrLf
-    
+
     Dim Db As DAO.Database
     Set Db = CurrentDb
     Dim td As DAO.TableDef
     Set td = Db.TableDefs(tbl_name)
     Dim idx As DAO.Index
-    
+
     For Each idx In td.Indexes
         If idx.Primary Then
             OutFile.Write Right$(idx.Fields, Len(idx.Fields) - 1)
@@ -53,7 +53,7 @@ Public Sub VCS_ExportLinkedTable(ByVal tbl_name As String, ByVal obj_path As Str
         End If
 
     Next
-    
+
 Err_LinkedTable_Fin:
     On Error Resume Next
     OutFile.Close
@@ -61,7 +61,7 @@ Err_LinkedTable_Fin:
     VCS_File.VCS_ConvertUcs2Utf8 tempFilePath, obj_path & tbl_name & ".LNKD"
     
     Exit Sub
-    
+
 Err_LinkedTable:
     OutFile.Close
     MsgBox Err.Description, vbCritical, "ERROR: EXPORT LINKED TABLE"
@@ -93,20 +93,20 @@ Private Function TableExists(ByVal TName As String) As Boolean
     Dim Db As DAO.Database
     Dim Found As Boolean
     Dim Test As String
-    
+
     Const NAME_NOT_IN_COLLECTION As Integer = 3265
-    
+
      ' Assume the table or query does not exist.
     Found = False
     Set Db = CurrentDb()
-    
+
      ' Trap for any errors.
     On Error Resume Next
-     
+
      ' See if the name is in the Tables collection.
     Test = Db.TableDefs(TName).name
     If Err.Number <> NAME_NOT_IN_COLLECTION Then Found = True
-    
+
     ' Reset the error variable.
     Err = 0
 
@@ -117,11 +117,11 @@ End Function
 Public Sub VCS_ExportTableData(ByVal tbl_name As String, ByVal obj_path As String)
     Dim FSO As Object
     Dim OutFile As Object
-    Dim rs As DAO.Recordset ' DAO.Recordset
-    Dim fieldObj As Object ' DAO.Field
+    Dim rs As DAO.Recordset
+    Dim fieldObj As Object
     Dim c As Long, Value As Variant
-    
-    ' Checks first
+
+    ' Check first
     If Not TableExists(tbl_name) Then
         Debug.Print "Error: Table " & tbl_name & " missing"
         Exit Sub
@@ -129,17 +129,17 @@ Public Sub VCS_ExportTableData(ByVal tbl_name As String, ByVal obj_path As Strin
 
     Set rs = CurrentDb.OpenRecordset("SELECT * FROM " & tbl_name)
     If rs.RecordCount = 0 Then
-        'why is this an error? Debug.Print "Error: Table " & tbl_name & "  empty"
         rs.Close
         Exit Sub
     End If
 
     Set FSO = CreateObject("Scripting.FileSystemObject")
-    ' open file for writing with Create=True, Unicode=True (USC-2 Little Endian format)
     VCS_Dir.VCS_MkDirIfNotExist obj_path
+
     Dim tempFileName As String
     tempFileName = VCS_File.VCS_TempFile()
 
+    ' Open file for writing with Create=True, Unicode=True (USC-2 Little Endian format)
     Set OutFile = FSO.CreateTextFile(tempFileName, overwrite:=True, Unicode:=True)
 
     c = 0
@@ -196,59 +196,58 @@ Public Sub VCS_ImportLinkedTable(ByVal tblName As String, ByRef obj_path As Stri
     
     On Error GoTo err_notable:
     DoCmd.DeleteObject acTable, tblName
-    
+
     GoTo err_notable_fin
-    
+
 err_notable:
     Err.Clear
     Resume err_notable_fin
-    
+
 err_notable_fin:
     On Error GoTo Err_CreateLinkedTable:
-    
+
     Dim td As DAO.TableDef
     Set td = Db.CreateTableDef(InFile.ReadLine())
-    
+
     Dim connect As String
     connect = InFile.ReadLine()
     If InStr(1, connect, "DATABASE=.\") Then 'replace relative path with literal path
         connect = Replace(connect, "DATABASE=.\", "DATABASE=" & CurrentProject.Path & "\")
     End If
     td.connect = connect
-    
+
     td.SourceTableName = InFile.ReadLine()
     Db.TableDefs.Append td
-    
+
     GoTo Err_CreateLinkedTable_Fin
-    
+
 Err_CreateLinkedTable:
     MsgBox Err.Description, vbCritical, "ERROR: IMPORT LINKED TABLE"
     Resume Err_CreateLinkedTable_Fin
-    
+
 Err_CreateLinkedTable_Fin:
-    'this will throw errors if a primary key already exists or the table is linked to an access database table
-    'will also error out if no pk is present
+    ' This will throw errors if a primary key already exists or the table is linked to an access database table
+    ' This will also error out if no pk is present
     On Error GoTo Err_LinkPK_Fin:
-    
+
     Dim Fields As String
     Fields = InFile.ReadLine()
     Dim Field As Variant
     Dim sql As String
     sql = "CREATE INDEX __uniqueindex ON " & td.name & " ("
-    
+
     For Each Field In Split(Fields, ";+")
         sql = sql & "[" & Field & "]" & ","
     Next
-    'remove extraneous comma
+    ' Remove extraneous comma
     sql = Left$(sql, Len(sql) - 1)
-    
+
     sql = sql & ") WITH PRIMARY"
     CurrentDb.Execute sql
     
 Err_LinkPK_Fin:
     On Error Resume Next
     InFile.Close
-    
 End Sub
 
 ' Import Table Definition
@@ -270,10 +269,11 @@ Public Sub VCS_ImportTableData(ByVal tblName As String, ByVal obj_path As String
     Dim c As Long, buf As String, Values() As String, Value As Variant
 
     Set FSO = CreateObject("Scripting.FileSystemObject")
-    
+
     Dim tempFileName As String
     tempFileName = VCS_File.VCS_TempFile()
     VCS_File.VCS_ConvertUtf8Ucs2 obj_path & tblName & ".txt", tempFileName
+
     ' open file for reading with Create=False, Unicode=True (USC-2 Little Endian format)
     Set InFile = FSO.OpenTextFile(tempFileName, iomode:=ForReading, create:=False, Format:=TristateTrue)
     Set Db = CurrentDb
