@@ -145,7 +145,6 @@ Public Sub VCS_SanitizeTextFiles(ByVal Path As String, ByVal Ext As String)
 
     ' Ensure that this is the begining of a block.
     srchPattern = srchPattern & " = Begin"
-'Debug.Print srchPattern
     rxBlock.Pattern = srchPattern
 
     ' Setup Line Matching Regex.
@@ -159,7 +158,6 @@ Public Sub VCS_SanitizeTextFiles(ByVal Path As String, ByVal Ext As String)
         srchPattern = srchPattern & "|PublishOption =1"
     End If
     srchPattern = srchPattern & ")"
-'Debug.Print srchPattern
     rxLine.Pattern = srchPattern
 
     Dim fileName As String
