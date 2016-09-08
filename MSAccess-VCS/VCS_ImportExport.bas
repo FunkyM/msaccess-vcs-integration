@@ -162,15 +162,10 @@ Public Sub VCS_ImportProject(Optional ByVal sourcePath As String = vbNullString,
 
     CloseFormsAndReports
 
-    Debug.Print
-    Debug.Print "Deleting Existing Objects"
-    Debug.Print
-
+    Debug.Print "> Deleting Existing Objects"
     VCS_DeleteAllObjects
 
-    Debug.Print "================="
-    Debug.Print "Importing Project"
-
+    Debug.Print "> Importing Project"
     VCS_ImportAllSources sourcePath
 
     Exit Sub
