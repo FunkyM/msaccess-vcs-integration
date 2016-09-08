@@ -11,6 +11,10 @@ Public Function VCS_ProjectPath() As String
     If Right$(VCS_ProjectPath, 1) <> "\" Then VCS_ProjectPath = VCS_ProjectPath & "\"
 End Function
 
+Public Function VCS_SourcePath() As String
+    VCS_SourcePath = VCS_ProjectPath() & CurrentProject.Name & ".src\"
+End Function
+
 ' Create folder `Path`. Silently do nothing if it already exists.
 Public Sub VCS_MkDirIfNotExist(ByVal Path As String)
     On Error GoTo MkDirIfNotexist_noop
