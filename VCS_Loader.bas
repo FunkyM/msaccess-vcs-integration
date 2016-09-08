@@ -69,6 +69,6 @@ Err_LoadHandler:
     Resume Next
 
 Fin_LoadHandler:
-    Debug.Print "Done"
-
+    Debug.Print "Loaded all VCS Modules."
 End Sub
+
