@@ -4,9 +4,129 @@ Option Compare Database
 Option Private Module
 Option Explicit
 
+Public Function VCS_ImportTableDefinitionsFromPath(ByVal path As String) As Integer
+    Dim obj_path As String
+    Dim obj_name As String
+    Dim fileName As String
 
+    obj_path = VCS_ObjectPath(path, "tbldef")
 
+    VCS_ImportTableDefinitionsFromPath = 0
 
+    fileName = Dir$(obj_path & "*.xml")
+    Do Until Len(fileName) = 0
+        obj_name = Mid$(fileName, 1, InStrRev(fileName, ".") - 1)
+
+        VCS_ImportTableDef CStr(obj_name), obj_path
+        VCS_DataMacro.VCS_ImportDataMacros obj_name, obj_path
+        VCS_ImportTableDefinitionsFromPath = VCS_ImportTableDefinitionsFromPath + 1
+
+        fileName = Dir$()
+    Loop
+
+    ' we must have access to the remote store to import these!
+    fileName = Dir$(obj_path & "*.LNKD")
+    Do Until Len(fileName) = 0
+        obj_name = Mid$(fileName, 1, InStrRev(fileName, ".") - 1)
+
+        VCS_ImportLinkedTable CStr(obj_name), obj_path & obj_name & ".LNKD"
+        VCS_ImportTableDefinitionsFromPath = VCS_ImportTableDefinitionsFromPath + 1
+
+        fileName = Dir$()
+    Loop
+End Function
+
+Public Function VCS_ExportTableDefinitionsToPath(ByVal Db As Object, ByVal path As String) As Integer
+    Dim obj_path As String
+
+    obj_path = VCS_ObjectPath(path, "tbldef")
+
+    VCS_Dir.VCS_MkDirIfNotExist Left$(obj_path, InStrRev(obj_path, "\"))
+    VCS_Dir.VCS_MkDirIfNotExist obj_path
+
+    VCS_Dir.VCS_DeleteFilesFromDirByExtension obj_path, "xml"
+    VCS_Dir.VCS_DeleteFilesFromDirByExtension obj_path, "LNKD"
+    VCS_Dir.VCS_DeleteFilesFromDirByExtension obj_path, "dm"
+
+    Dim td As DAO.TableDef
+
+    VCS_ExportTableDefinitionsToPath = 0
+    For Each td In Db.TableDefs
+        ' Skip system tables
+        ' Skip temporary tables
+        If _
+            Left$(td.name, 4) <> "MSys" And _
+            Left$(td.name, 1) <> "~" _
+        Then
+            If Len(td.connect) = 0 Then ' this is not an external table
+                VCS_ExportTableDef td.name, obj_path
+                VCS_DataMacro.VCS_ExportDataMacros td.name, obj_path
+            Else
+                VCS_ExportLinkedTable td.name, obj_path & td.name & ".LNKD"
+            End If
+            VCS_ExportTableDefinitionsToPath = VCS_ExportTableDefinitionsToPath + 1
+        End If
+    Next
+End Function
+
+Public Function VCS_ImportTablesFromPath(ByVal path As String) As Integer
+    Dim obj_path As String
+    Dim obj_name As String
+    Dim fileName As String
+
+    obj_path = VCS_ObjectPath(path, "tables")
+
+    VCS_ImportTablesFromPath = 0
+
+    fileName = Dir$(obj_path & "*.txt")
+    Do Until Len(fileName) = 0
+        DoEvents
+
+        obj_name = Mid$(fileName, 1, InStrRev(fileName, ".") - 1)
+
+        VCS_ImportTableData CStr(obj_name), obj_path
+        VCS_ImportTablesFromPath = VCS_ImportTablesFromPath + 1
+
+        fileName = Dir$()
+    Loop
+End Function
+
+Public Function VCS_ExportTablesToPath(ByVal Db As Object, ByVal path As String, Optional ByVal IncludeTables As String = "") As Integer
+    Dim obj_path As String
+
+    obj_path = VCS_ObjectPath(path, "tables")
+
+    VCS_Dir.VCS_MkDirIfNotExist Left$(obj_path, InStrRev(obj_path, "\"))
+    VCS_Dir.VCS_DeleteFilesFromDirByExtension obj_path, "txt"
+
+    Dim td As DAO.TableDef
+
+    VCS_ExportTablesToPath = 0
+    For Each td In Db.TableDefs
+        ' Skip system tables
+        ' Skip temporary tables
+        If _
+            Left$(td.name, 4) <> "MSys" And _
+            Left$(td.name, 1) <> "~" _
+        Then
+            If Len(td.connect) = 0 Then ' this is not an external table
+                If VCS_HasToken(IncludeTables, "*") Then
+                    DoEvents
+                    VCS_ExportTableData CStr(td.name), obj_path
+                    If Len(Dir$(obj_path & td.name & ".txt")) > 0 Then
+                        VCS_ExportTablesToPath = VCS_ExportTablesToPath + 1
+                    End If
+                ElseIf VCS_HasToken(IncludeTables, td.name) Then
+                    DoEvents
+                    On Error GoTo Err_TableNotFound
+                    VCS_ExportTableData CStr(td.name), obj_path
+                    VCS_ExportTablesToPath = VCS_ExportTablesToPath + 1
+Err_TableNotFound:
+                End If
+            End If
+        End If
+    Next
+End Function
 
 Public Sub VCS_ExportLinkedTable(ByVal tbl_name As String, ByVal fileName As String)
     On Error GoTo Err_LinkedTable
