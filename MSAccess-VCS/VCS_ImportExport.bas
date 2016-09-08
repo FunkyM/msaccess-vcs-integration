@@ -15,24 +15,29 @@ Private Const DebugOutput As Boolean = False
 Private Const ArchiveMyself As Boolean = False
 
 
-'returns true if named module is NOT part of the VCS code
-Private Function IsNotVCS(ByVal name As String) As Boolean
-    If name <> "VCS_ImportExport" And _
-      name <> "VCS_IE_Functions" And _
-      name <> "VCS_File" And _
-      name <> "VCS_Dir" And _
-      name <> "VCS_String" And _
-      name <> "VCS_Loader" And _
-      name <> "VCS_Table" And _
-      name <> "VCS_Reference" And _
+' Returns true if named module is NOT part of the VCS code
+Public Function IsNotVCS(ByVal name As String) As Boolean
+    If _
       name <> "VCS_DataMacro" And _
+      name <> "VCS_Dir" And _
+      name <> "VCS_File" And _
+      name <> "VCS_Form" And _
+      name <> "VCS_IE_Functions" And _
+      name <> "VCS_ImportExport" And _
+      name <> "VCS_Macro" And _
+      name <> "VCS_Module" And _
+      name <> "VCS_Query" And _
+      name <> "VCS_Reference" And _
+      name <> "VCS_Relation" And _
       name <> "VCS_Report" And _
-      name <> "VCS_Relation" Then
+      name <> "VCS_String" And _
+      name <> "VCS_Table" And _
+      name <> "VCS_Loader" _
+    Then
         IsNotVCS = True
     Else
         IsNotVCS = False
     End If
-
 End Function
 
 ' Main entry point for EXPORT. Export all forms, reports, queries,
