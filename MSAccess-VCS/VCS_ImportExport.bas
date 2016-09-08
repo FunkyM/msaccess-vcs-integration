@@ -8,7 +8,7 @@ Option Explicit
 Public Const IncludeTables As String = "*"
 
 ' Enables extended debug output to the immediate window
-Public Const DebugOutput As Boolean = False
+Public Const DebugOutput As Boolean = True
 
 ' Determines if VCS_ modules are to to be exported, too
 Public Const ArchiveMyself As Boolean = False
