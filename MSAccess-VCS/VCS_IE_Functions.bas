@@ -54,7 +54,71 @@ Public Sub VCS_ImportObject(ByVal obj_type_num As Integer, ByVal obj_name As Str
     End If
 End Sub
 
-'shouldn't this be SanitizeTextFile (Singular)?
+Public Sub VCS_DeleteAllObjects()
+    Dim objType As Variant
+
+    For Each objType In Split("Relation Query Table Form Report Macro Module")
+        VCS_DeleteObjects(objType)
+    Next
+End Sub
+
+' Deletes all objects of given type from the current database
+Public Sub VCS_DeleteObjects(ByVal objType As String)
+    Dim dbSource As DAO.Database
+    Dim doc As Object
+
+    Set dbSource = CurrentDb()
+
+    Select Case objType
+        Case "Relation"
+            ' Delete Relations
+            For Each doc In dbSource.Relations
+                If _
+                    Not (doc.name = "MSysNavPaneGroupsMSysNavPaneGroupToObjects" Or _
+                    doc.name = "MSysNavPaneGroupCategoriesMSysNavPaneGroups") _
+                Then
+                    dbSource.Relations.Delete(doc.name)
+                End If
+            Next
+        Case "Query"
+            ' Delete Queries
+            For Each doc In dbSource.QueryDefs
+                DoEvents
+                If _
+                    Left$(doc.name, 1) <> "~" _
+                Then
+                    dbSource.QueryDefs.Delete(doc.name)
+                End If
+            Next
+        Case "Table"
+            ' Delete Table Definitions
+            For Each doc In dbSource.TableDefs
+                If _
+                    Left$(doc.name, 4) <> "MSys" And _
+                    Left$(doc.name, 1) <> "~" _
+                Then
+                    dbSource.TableDefs.Delete(doc.name)
+                End If
+            Next
+        Case "Form", "Report", "Macro", "Module"
+            ' Delete Forms, Reports, Macros and Modules
+            DoEvents
+            For Each doc In dbSource.Containers(VCS_GetContainerNameForObjectType(objType)).Documents
+                DoEvents
+                If _
+                    (Left$(doc.name, 1) <> "~") _
+                Then
+                    If _
+                        objType <> "Module" Or _
+                        (objType = "Module" And IsNotVCS(doc.name)) _
+                    Then
+                        DoCmd.DeleteObject VCS_GetAccessTypeForObjectType(objType), doc.name
+                    End If
+                End If
+            Next
+        Case ""
+    End Select
+End Sub
 
 ' For each *.txt in `Path`, find and remove a number of problematic but
 ' unnecessary lines of VB code that are inserted automatically by the

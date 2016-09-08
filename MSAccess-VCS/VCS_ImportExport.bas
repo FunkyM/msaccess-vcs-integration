@@ -445,66 +445,14 @@ On Error GoTo errorHandler
         Exit Sub
     End If
 
-    Dim Db As DAO.Database
-    Set Db = CurrentDb
     CloseFormsAndReports
 
     Debug.Print
     Debug.Print "Deleting Existing Objects"
     Debug.Print
-    
-    Dim rel As DAO.Relation
-    For Each rel In CurrentDb.Relations
-        If Not (rel.name = "MSysNavPaneGroupsMSysNavPaneGroupToObjects" Or _
-                rel.name = "MSysNavPaneGroupCategoriesMSysNavPaneGroups") Then
-            CurrentDb.Relations.Delete (rel.name)
-        End If
-    Next
 
-    Dim dbObject As Object
-    For Each dbObject In Db.QueryDefs
-        DoEvents
-        If Left$(dbObject.name, 1) <> "~" Then
-'            Debug.Print dbObject.Name
-            Db.QueryDefs.Delete dbObject.name
-        End If
-    Next
-    
-    Dim td As DAO.TableDef
-    For Each td In CurrentDb.TableDefs
-        If Left$(td.name, 4) <> "MSys" And _
-            Left$(td.name, 1) <> "~" Then
-            CurrentDb.TableDefs.Delete (td.name)
-        End If
-    Next
+    VCS_DeleteAllObjects
 
-    Dim objType As Variant
-    Dim objTypeArray() As String
-    Dim doc As Object
-    '
-    '  Object Type Constants
-    Const OTNAME As Byte = 0
-    Const OTID As Byte = 1
-
-    For Each objType In Split( _
-            "Forms|" & acForm & "," & _
-            "Reports|" & acReport & "," & _
-            "Scripts|" & acMacro & "," & _
-            "Modules|" & acModule _
-            , "," _
-        )
-        objTypeArray = Split(objType, "|")
-        DoEvents
-        For Each doc In Db.Containers(objTypeArray(OTNAME)).Documents
-            DoEvents
-            If (Left$(doc.name, 1) <> "~") And _
-               (IsNotVCS(doc.name)) Then
-'                Debug.Print doc.Name
-                DoCmd.DeleteObject objTypeArray(OTID), doc.name
-            End If
-        Next
-    Next
-    
     Debug.Print "================="
     Debug.Print "Importing Project"
     ImportAllSource
