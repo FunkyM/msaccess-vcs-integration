@@ -42,7 +42,6 @@ End Function
 ' Returns true if named module is NOT part of the VCS code
 Public Function IsNotVCS(ByVal name As String) As Boolean
     If _
-      name <> "VCS_DataMacro" And _
       name <> "VCS_Dir" And _
       name <> "VCS_File" And _
       name <> "VCS_IE_Functions" And _
