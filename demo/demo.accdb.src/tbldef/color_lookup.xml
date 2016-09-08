@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="UTF-16" standalone="no"?>
+<DataMacros xmlns="http://schemas.microsoft.com/office/accessservices/2009/11/application">
+<DataMacro Name="color_lookup_table_data_macro">
+<Statements>
+<Comment>
+This is a TableDataMacro comment.</Comment>
+<Action Name="SetLocalVar">
+<Argument Name="Name">
+TestDataMacroVar</Argument>
+<Argument Name="Value">
+True</Argument>
+</Action>
+</Statements>
+</DataMacro>
+</DataMacros>

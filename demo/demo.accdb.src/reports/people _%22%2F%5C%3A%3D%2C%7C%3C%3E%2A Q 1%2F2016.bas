@@ -1,36 +1,31 @@
 ﻿Version =20
 VersionRequired =20
-Begin Form
-    AutoCenter = NotDefault
+Begin Report
+    LayoutForPrint = NotDefault
     DividingLines = NotDefault
     AllowDesignChanges = NotDefault
-    ViewsAllowed =1
+    DateGrouping =1
+    GrpKeepTogether =1
     PictureAlignment =2
     DatasheetGridlinesBehavior =3
     GridX =24
     GridY =24
     Width =11400
     DatasheetFontHeight =11
-    ItemSuffix =5
-    Right =15735
-    Bottom =10215
+    ItemSuffix =7
     DatasheetGridlinesColor =14806254
     RecSrcDt = Begin
-        0x69f339541c33e440
+        0x83de6a571c33e440
     End
     RecordSource ="people"
     Caption ="people"
     DatasheetFontName ="Calibri"
     PrtMip = Begin
-        0x6801000068010000680100006801000000000000201c0000e010000001000000 ,
+        0xe0010000e0010000680100006801000000000000201c0000e010000001000000 ,
         0x010000006801000000000000a10700000100000001000000
     End
-    AllowDatasheetView =0
-    AllowPivotTableView =0
-    AllowPivotChartView =0
-    AllowPivotChartView =0
     FilterOnLoad =0
-    ShowPageMargins =0
+    FitToPage =1
     DisplayOnSharePointSite =1
     DatasheetAlternateBackColor =15921906
     DatasheetGridlinesColor12 =0
@@ -63,6 +58,7 @@ Begin Form
             FontSize =11
             FontName ="Calibri"
             AsianLineBreak =1
+            ShowDatePicker =0
             BackThemeColorIndex =1
             BorderThemeColorIndex =1
             BorderShade =65.0
@@ -89,10 +85,14 @@ Begin Form
             GridlineThemeColorIndex =1
             GridlineShade =65.0
         End
+        Begin BreakLevel
+            ControlSource ="full_name"
+        End
         Begin FormHeader
-            Height =1080
+            KeepTogether = NotDefault
+            Height =960
             BackColor =15849926
-            Name ="FormHeader"
+            Name ="ReportHeader"
             AutoHeight =1
             AlternateBackThemeColorIndex =1
             AlternateBackShade =95.0
@@ -100,10 +100,35 @@ Begin Form
             BackTint =20.0
             Begin
                 Begin Label
-                    OverlapFlags =85
+                    Left =60
+                    Top =60
+                    Width =1200
+                    Height =540
+                    FontSize =20
+                    BorderColor =8355711
+                    ForeColor =8355711
+                    Name ="Label4"
+                    Caption ="people"
+                    GridlineColor =10921638
+                    LayoutCachedLeft =60
+                    LayoutCachedTop =60
+                    LayoutCachedWidth =1260
+                    LayoutCachedHeight =600
+                End
+            End
+        End
+        Begin PageHeader
+            Height =435
+            Name ="PageHeaderSection"
+            AutoHeight =1
+            AlternateBackThemeColorIndex =1
+            AlternateBackShade =95.0
+            BackThemeColorIndex =1
+            Begin
+                Begin Label
                     TextAlign =1
                     Left =360
-                    Top =720
+                    Top =60
                     Width =7260
                     Height =315
                     BorderColor =8355711
@@ -114,15 +139,14 @@ Begin Form
                     GridlineStyleBottom =1
                     GridlineColor =10921638
                     LayoutCachedLeft =360
-                    LayoutCachedTop =720
+                    LayoutCachedTop =60
                     LayoutCachedWidth =7620
-                    LayoutCachedHeight =1035
+                    LayoutCachedHeight =375
                 End
                 Begin Label
-                    OverlapFlags =85
                     TextAlign =1
                     Left =7680
-                    Top =720
+                    Top =60
                     Width =3660
                     Height =315
                     BorderColor =8355711
@@ -133,31 +157,15 @@ Begin Form
                     GridlineStyleBottom =1
                     GridlineColor =10921638
                     LayoutCachedLeft =7680
-                    LayoutCachedTop =720
-                    LayoutCachedWidth =11340
-                    LayoutCachedHeight =1035
-                End
-                Begin Label
-                    OverlapFlags =215
-                    Left =60
-                    Top =60
-                    Width =1440
-                    Height =1020
-                    FontSize =20
-                    BorderColor =8355711
-                    ForeColor =8355711
-                    Name ="Label4"
-                    Caption ="people"
-                    GridlineColor =10921638
-                    LayoutCachedLeft =60
                     LayoutCachedTop =60
-                    LayoutCachedWidth =1500
-                    LayoutCachedHeight =1080
+                    LayoutCachedWidth =11340
+                    LayoutCachedHeight =375
                 End
             End
         End
         Begin Section
-            Height =720
+            KeepTogether = NotDefault
+            Height =450
             Name ="Detail"
             AutoHeight =1
             AlternateBackColor =15921906
@@ -166,15 +174,12 @@ Begin Form
             BackThemeColorIndex =1
             Begin
                 Begin TextBox
-                    EnterKeyBehavior = NotDefault
-                    ScrollBars =2
-                    OverlapFlags =85
+                    OldBorderStyle =0
                     IMESentenceMode =3
                     Left =360
                     Top =60
                     Width =7260
-                    Height =600
-                    ColumnWidth =3000
+                    Height =330
                     BorderColor =10921638
                     ForeColor =4210752
                     Name ="full_name"
@@ -184,11 +189,10 @@ Begin Form
                     LayoutCachedLeft =360
                     LayoutCachedTop =60
                     LayoutCachedWidth =7620
-                    LayoutCachedHeight =660
+                    LayoutCachedHeight =390
                 End
                 Begin ComboBox
                     LimitToList = NotDefault
-                    OverlapFlags =85
                     IMESentenceMode =3
                     ColumnCount =2
                     ListWidth =1440
@@ -196,7 +200,6 @@ Begin Form
                     Top =60
                     Width =3660
                     Height =330
-                    ColumnWidth =3000
                     TabIndex =1
                     BorderColor =10921638
                     ForeColor =4138256
@@ -216,9 +219,60 @@ Begin Form
                 End
             End
         End
+        Begin PageFooter
+            Height =570
+            Name ="PageFooterSection"
+            AutoHeight =1
+            AlternateBackThemeColorIndex =1
+            AlternateBackShade =95.0
+            BackThemeColorIndex =1
+            Begin
+                Begin TextBox
+                    OldBorderStyle =0
+                    TextAlign =1
+                    IMESentenceMode =3
+                    Left =60
+                    Top =240
+                    Width =5040
+                    Height =330
+                    BorderColor =10921638
+                    ForeColor =4210752
+                    Name ="Text5"
+                    ControlSource ="=Now()"
+                    Format ="Long Date"
+                    GridlineColor =10921638
+
+                    LayoutCachedLeft =60
+                    LayoutCachedTop =240
+                    LayoutCachedWidth =5100
+                    LayoutCachedHeight =570
+                End
+                Begin TextBox
+                    OldBorderStyle =0
+                    TextAlign =3
+                    IMESentenceMode =3
+                    Left =6300
+                    Top =240
+                    Width =5040
+                    Height =330
+                    TabIndex =1
+                    BorderColor =10921638
+                    ForeColor =4210752
+                    Name ="Text6"
+                    ControlSource ="=\"Page \" & [Page] & \" of \" & [Pages]"
+                    GridlineColor =10921638
+
+                    LayoutCachedLeft =6300
+                    LayoutCachedTop =240
+                    LayoutCachedWidth =11340
+                    LayoutCachedHeight =570
+                End
+            End
+        End
         Begin FormFooter
+            KeepTogether = NotDefault
             Height =0
-            Name ="FormFooter"
+            Name ="ReportFooter"
             AutoHeight =1
             AlternateBackThemeColorIndex =1
             AlternateBackShade =95.0

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataroot xmlns:od="urn:schemas-microsoft-com:officedata" generated="2016-09-09T01:16:42">
+<people>
+<id>1</id>
+<full_name>alice</full_name>
+<favorite_color>4</favorite_color>
+</people>
+<people>
+<id>2</id>
+<full_name>bob</full_name>
+<favorite_color>5</favorite_color>
+</people>
+</dataroot>

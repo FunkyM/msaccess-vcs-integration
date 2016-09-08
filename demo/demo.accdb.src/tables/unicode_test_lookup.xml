@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataroot xmlns:od="urn:schemas-microsoft-com:officedata" generated="2016-09-09T01:16:42">
+<unicode_test_lookup>
+<id>1</id>
+<value>Résumé</value>
+</unicode_test_lookup>
+<unicode_test_lookup>
+<id>2</id>
+<value>Tromsø</value>
+</unicode_test_lookup>
+</dataroot>
