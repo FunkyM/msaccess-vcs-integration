@@ -18,6 +18,23 @@ Public Const ArchiveMyself As Boolean = False
 ' Not required for git
 Public Const ConvertUcs2ToUtf8 As Boolean = True
 
+Public Sub VCS_Debug(Optional ByVal strMessage As String = "", Optional ByVal strLevel As String = "Debug", Optional ByVal withNewLine As Boolean = True)
+    If withNewLine Then
+        strMessage = strMessage & vbNewLine
+    End If
+
+    Select Case strLevel
+        Case "Info"
+            Debug.Print strMessage ;
+        Case "Debug"
+            If DebugOutput Then
+                Debug.Print strMessage ;
+            End If
+        Case Else
+            Debug.Print strLevel & ": " & strMessage ;
+    End Select
+End Sub
+
 Private Function GetElapsedTime(ByVal startTime As Single) As String
     GetElapsedTime = Round(Timer - startTime, 2) & " seconds"
 End Function
