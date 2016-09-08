@@ -16,6 +16,24 @@ Private Const StripPublishOption As Boolean = True
 Public Const ForReading = 1, ForWriting = 2, ForAppending = 8
 Public Const TristateTrue = -1, TristateFalse = 0, TristateUseDefault = -2
 
+Public Function VCS_ShouldHandleUcs2Conversion(ByVal objType As String) As Boolean
+    If _
+        VCS_UsingUcs2() And _
+        VCS_ImportExport.ConvertUcs2ToUtf8 _
+    Then
+        Select Case objType
+            Case "Query", "Form", "Report", "Macro", "TableDataMacro"
+                VCS_ShouldHandleUcs2Conversion = True
+            Case "Module"
+                ' Modules always use UTF-8
+                VCS_ShouldHandleUcs2Conversion = False
+            Case Else
+                VCS_ShouldHandleUcs2Conversion = False
+        End Select
+    Else
+        VCS_ShouldHandleUcs2Conversion = False
+    End If
+End Function
 
 ' Can we export without closing the form?
 

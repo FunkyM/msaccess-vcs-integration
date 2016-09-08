@@ -14,6 +14,10 @@ Private Const DebugOutput As Boolean = False
 'Causes the VCS_ code to be exported
 Private Const ArchiveMyself As Boolean = False
 
+' Converts UCS-2 LE encoded sources to UTF-8 automatically
+' Useful since some version control systems treat UCS-2 encoded files as binary
+' Not required for git
+Public Const ConvertUcs2ToUtf8 As Boolean = True
 
 ' Returns true if named module is NOT part of the VCS code
 Public Function IsNotVCS(ByVal name As String) As Boolean
