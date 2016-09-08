@@ -4,6 +4,50 @@ Option Compare Database
 Option Private Module
 Option Explicit
 
+Public Function VCS_ImportRelationsFromPath(ByVal path As String) As Integer
+    Dim obj_path As String
+    Dim fileName As String
+
+    obj_path = VCS_ObjectPath(path, "relations")
+
+    VCS_ImportRelationsFromPath = 0
+
+    fileName = Dir$(obj_path & "*.txt")
+    Do Until Len(fileName) = 0
+        DoEvents
+
+        VCS_Relation.VCS_ImportRelation obj_path & fileName
+        VCS_ImportRelationsFromPath = VCS_ImportRelationsFromPath + 1
+
+        fileName = Dir$()
+    Loop
+End Function
+
+Public Function VCS_ExportRelationsToPath(Db As Object, ByVal path As String) As Integer
+    Dim obj_path As String
+    Dim aRelation As DAO.Relation
+
+    obj_path = VCS_ObjectPath(path, "relations")
+
+    VCS_Dir.VCS_MkDirIfNotExist Left$(obj_path, InStrRev(obj_path, "\"))
+    VCS_Dir.VCS_DeleteFilesFromDirByExtension obj_path, "txt"
+
+    VCS_ExportRelationsToPath = 0
+    For Each aRelation In Db.Relations
+        ' Exclude relations from system tables and inherited (linked) relations
+        ' Skip if dbRelationDontEnforce property is not set. The relationship is already in the table xml file. - sean
+        If _
+            Not (aRelation.name = "MSysNavPaneGroupsMSysNavPaneGroupToObjects" Or _
+            aRelation.name = "MSysNavPaneGroupCategoriesMSysNavPaneGroups" Or _
+            (aRelation.Attributes And DAO.RelationAttributeEnum.dbRelationInherited) = _
+                DAO.RelationAttributeEnum.dbRelationInherited) And _
+            (aRelation.Attributes = DAO.RelationAttributeEnum.dbRelationDontEnforce) _
+        Then
+            VCS_Relation.VCS_ExportRelation aRelation, obj_path & aRelation.name & ".txt"
+            VCS_ExportRelationsToPath = VCS_ExportRelationsToPath + 1
+        End If
+    Next
+End Function
 
 Public Sub VCS_ExportRelation(ByVal rel As DAO.Relation, ByVal filePath As String)
     Dim FSO As Object
