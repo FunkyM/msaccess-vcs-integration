@@ -434,13 +434,13 @@ Public Sub ImportAllSource()
     Debug.Print "Done."
 End Sub
 
-' Main entry point for ImportProject.
-' Drop all forms, reports, queries, macros, modules.
-' execute ImportAllSource.
-Public Sub ImportProject()
-On Error GoTo errorHandler
+' Imports all sources from a path and drops all objects
+Public Sub VCS_ImportProject(Optional ByVal prompt As Boolean = True)
+    On Error GoTo errorHandler
 
-    If MsgBox("This action will delete all existing: " & vbCrLf & _
+    If _
+        prompt And _
+        MsgBox("This action will delete all existing: " & vbCrLf & _
               vbCrLf & _
               Chr$(149) & " Tables" & vbCrLf & _
               Chr$(149) & " Forms" & vbCrLf & _
@@ -450,7 +450,8 @@ On Error GoTo errorHandler
               Chr$(149) & " Reports" & vbCrLf & _
               vbCrLf & _
               "Are you sure you want to proceed?", vbCritical + vbYesNo, _
-              "Import Project") <> vbYes Then
+              "Import Project") <> vbYes _
+    Then
         Exit Sub
     End If
 
