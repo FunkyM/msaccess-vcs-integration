@@ -55,8 +55,7 @@ Public Sub ExportAllSource()
 
     Set Db = CurrentDb
 
-    CloseFormsReports
-    'InitVCS_UsingUcs2
+    CloseFormsAndReports
 
     source_path = VCS_Dir.VCS_ProjectPath() & "source\"
     VCS_Dir.VCS_MkDirIfNotExist source_path
@@ -233,8 +232,7 @@ Public Sub ImportAllSource()
 
     Set FSO = CreateObject("Scripting.FileSystemObject")
 
-    CloseFormsReports
-    'InitVCS_UsingUcs2
+    CloseFormsAndReports
 
     source_path = VCS_Dir.VCS_ProjectPath() & "source\"
     If Not FSO.FolderExists(source_path) Then
@@ -449,7 +447,7 @@ On Error GoTo errorHandler
 
     Dim Db As DAO.Database
     Set Db = CurrentDb
-    CloseFormsReports
+    CloseFormsAndReports
 
     Debug.Print
     Debug.Print "Deleting Existing Objects"
@@ -518,14 +516,8 @@ errorHandler:
                 Err.Description
 End Sub
 
-
-'===================================================================================================================================
-'-----------------------------------------------------------'
-' Helper Functions - these should be put in their own files '
-'-----------------------------------------------------------'
-
-' Close all open forms.
-Private Sub CloseFormsReports()
+' Close all open forms
+Private Sub CloseFormsAndReports()
     On Error GoTo errorHandler
     Do While Forms.Count > 0
         DoCmd.Close acForm, Forms(0).name
@@ -538,6 +530,6 @@ Private Sub CloseFormsReports()
     Exit Sub
 
 errorHandler:
-    Debug.Print "VCS_ImportExport.CloseFormsReports: Error #" & Err.Number & vbCrLf & _
+    Debug.Print "VCS_ImportExport.CloseFormsAndReports: Error #" & Err.Number & vbCrLf & _
                 Err.Description
 End Sub
