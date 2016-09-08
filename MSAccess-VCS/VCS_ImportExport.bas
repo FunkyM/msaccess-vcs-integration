@@ -65,57 +65,41 @@ Public Function IsNotVCS(ByVal name As String) As Boolean
 End Function
 
 ' Exports all forms, reports, queries, macros, modules and tables to a path
-Public Sub VCS_ExportAllSources(Optional ByVal sourcePath As String = vbNullString, Optional IncludeTables As String = "")
-    Dim Db As Object ' DAO.Database
-    Dim source_path As String
-    Dim procToCall As String
-    Dim obj As Variant
-    Dim obj_count As Integer
-    Dim result As Variant
+Public Sub VCS_ExportAllSources(Optional ByVal sourcePath As String = vbNullString, Optional ByVal strTablesToExportWithData As String = "*")
+    Dim exportPath As String
+    Dim objType As Variant
+    Dim objCount As Integer
     Dim startTime As Single
 
     startTime = Timer
 
-    Set Db = CurrentDb()
-
     CloseFormsAndReports
 
     If sourcePath <> vbNullString Then
-        source_path = sourcePath
+        exportPath = sourcePath
     Else
-        source_path = VCS_Dir.VCS_SourcePath()
+        exportPath = VCS_Dir.VCS_SourcePath()
     End If
 
-    VCS_Dir.VCS_MkDirIfNotExist source_path
+    VCS_Dir.VCS_MkDirIfNotExist exportPath
 
-    For Each obj In Split("Queries Forms Reports Macros Modules References TableDefinitions Tables Relations")
-        Debug.Print VCS_PadRight("Exporting " & obj & "...", 24);
+    VCS_Debug "> Export Starting."
 
-        procToCall = "VCS_Export" & obj & "ToPath"
+    For Each objType In Split("Query Form Report Macro Module Reference Table Relation")
+        VCS_Debug VCS_PadRight("Exporting " & objType & " Objects...", 32), withNewLine:=False
+        objCount = VCS_ExportObjects(objType, exportPath, strTablesToExportWithData)
+        VCS_Debug "Done (" & objCount & ")"
 
-        Select Case obj
-            Case "Tables"
-                obj_count = Application.Run(procToCall, Db, source_path, IncludeTables)
-            Case "References"
-                obj_count = Application.Run(procToCall, source_path)
-            Case Else
-                obj_count = Application.Run(procToCall, Db, source_path)
-        End Select
-
-        Debug.Print "[" & obj_count & "]"
-
-        procToCall = "VCS_Sanitize" & obj
-
-        ' Sanitize some objects
-        Select Case obj
-            Case "Queries", "Forms", "Reports", "Macros"
-                Debug.Print VCS_PadRight("Sanitizing " & obj & "...", 15);
-                result = Application.Run(procToCall, source_path)
-                Debug.Print "Done."
+        ' Sanitize queries, forms, reports and macros
+        Select Case objType
+            Case "Query", "Form", "Report", "Macro"
+                VCS_Debug VCS_PadRight("Sanitizing " & objType & " Files...", 32), withNewLine:=False
+                VCS_SanitizeFilesForObjectTypeAtPath objType, VCS_ObjectPath(exportPath, objType)
+                VCS_Debug "Done"
         End Select
     Next
 
-    Debug.Print "Done. (" & GetElapsedTime(startTime) & ")"
+    VCS_Debug "> Export Finished. (" & GetElapsedTime(startTime) & ")"
 End Sub
 
 ' Imports all forms, reports, queries, macros, modules and tables from a path
