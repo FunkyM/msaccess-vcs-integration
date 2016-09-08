@@ -40,18 +40,18 @@ DelIfNotExist_Noop:
     On Error GoTo 0
 End Sub
 
-' Erase all *.`ext` files in `Path`.
-Public Sub VCS_ClearTextFilesFromDir(ByVal Path As String, ByVal Ext As String)
+' Delete all *.`ext` files in `Path`.
+Public Sub VCS_DeleteFilesFromDirByExtension(ByVal Path As String, ByVal Ext As String)
     Dim FSO As Object
     Set FSO = CreateObject("Scripting.FileSystemObject")
     If Not FSO.FolderExists(Path) Then Exit Sub
 
-    On Error GoTo VCS_ClearTextFilesFromDir_noop
+    On Error GoTo VCS_DeleteFilesFromDirByExtension_noop
     If Dir$(Path & "*." & Ext) <> vbNullString Then
         FSO.DeleteFile Path & "*." & Ext
     End If
-    
-VCS_ClearTextFilesFromDir_noop:
+
+VCS_DeleteFilesFromDirByExtension_noop:
     On Error GoTo 0
 End Sub
 
