@@ -72,3 +72,18 @@ Fin_LoadHandler:
     Debug.Print "Loaded all VCS Modules."
 End Sub
 
+Public Sub unloadVCS()
+    Dim Db As Object
+    Dim doc As Object
+
+    Set Db = CurrentDb()
+
+    For Each doc In Db.Containers("Modules").Documents
+        If (Left$(doc.name, 4) = "VCS_") Then
+            Debug.Print "Deleting " & doc.name & "..."
+            DoCmd.DeleteObject acModule, doc.name
+        End If
+    Next
+
+    Debug.Print "Unloaded all VCS Modules."
+End Sub
