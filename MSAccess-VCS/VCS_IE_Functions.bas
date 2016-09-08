@@ -120,35 +120,35 @@ Public Sub VCS_DeleteObjects(ByVal objType As String)
     End Select
 End Sub
 
-' For each *.txt in `Path`, find and remove a number of problematic but
+' For each *.`ext` in `Path`, find and remove a number of problematic but
 ' unnecessary lines of VB code that are inserted automatically by the
 ' Access GUI and change often (we don't want these lines of code in
 ' version control).
 Public Sub VCS_SanitizeTextFiles(ByVal Path As String, ByVal Ext As String)
-
     Dim FSO As Object
     Set FSO = CreateObject("Scripting.FileSystemObject")
-    '
-    '  Setup Block matching Regex.
+
+    ' Setup Block matching Regex.
     Dim rxBlock As Object
     Set rxBlock = CreateObject("VBScript.RegExp")
     rxBlock.ignoreCase = False
-    '
-    '  Match PrtDevNames / Mode with or  without W
+
+    ' Match PrtDevNames / Mode with or without W
     Dim srchPattern As String
     srchPattern = "PrtDev(?:Names|Mode)[W]?"
     If (AggressiveSanitize = True) Then
-      '  Add and group aggressive matches
-      srchPattern = "(?:" & srchPattern
-      srchPattern = srchPattern & "|GUID|""GUID""|NameMap|dbLongBinary ""DOL"""
-      srchPattern = srchPattern & ")"
+        '  Add and group aggressive matches
+        srchPattern = "(?:" & srchPattern
+        srchPattern = srchPattern & "|GUID|""GUID""|NameMap|dbLongBinary ""DOL"""
+        srchPattern = srchPattern & ")"
     End If
-    '  Ensure that this is the begining of a block.
+
+    ' Ensure that this is the begining of a block.
     srchPattern = srchPattern & " = Begin"
 'Debug.Print srchPattern
     rxBlock.Pattern = srchPattern
-    '
-    '  Setup Line Matching Regex.
+
+    ' Setup Line Matching Regex.
     Dim rxLine As Object
     Set rxLine = CreateObject("VBScript.RegExp")
     srchPattern = "^\s*(?:"
@@ -161,11 +161,13 @@ Public Sub VCS_SanitizeTextFiles(ByVal Path As String, ByVal Ext As String)
     srchPattern = srchPattern & ")"
 'Debug.Print srchPattern
     rxLine.Pattern = srchPattern
+
     Dim fileName As String
     fileName = Dir$(Path & "*." & Ext)
+
     Dim isReport As Boolean
     isReport = False
-    
+
     Do Until Len(fileName) = 0
         DoEvents
         Dim obj_name As String
@@ -175,31 +177,31 @@ Public Sub VCS_SanitizeTextFiles(ByVal Path As String, ByVal Ext As String)
         Set InFile = FSO.OpenTextFile(Path & obj_name & "." & Ext, iomode:=ForReading, create:=False, Format:=TristateFalse)
         Dim OutFile As Object
         Set OutFile = FSO.CreateTextFile(Path & obj_name & ".sanitize", overwrite:=True, Unicode:=False)
-    
+
         Dim getLine As Boolean
         getLine = True
-        
+
         Do Until InFile.AtEndOfStream
             DoEvents
             Dim txt As String
-            '
+
             ' Check if we need to get a new line of text
             If getLine = True Then
                 txt = InFile.ReadLine
             Else
                 getLine = True
             End If
-            '
+
             ' Skip lines starting with line pattern
             If rxLine.Test(txt) Then
                 Dim rxIndent As Object
                 Set rxIndent = CreateObject("VBScript.RegExp")
                 rxIndent.Pattern = "^(\s+)\S"
-                '
+
                 ' Get indentation level.
                 Dim matches As Object
                 Set matches = rxIndent.Execute(txt)
-                '
+
                 ' Setup pattern to match current indent
                 Select Case matches.Count
                     Case 0
@@ -208,7 +210,7 @@ Public Sub VCS_SanitizeTextFiles(ByVal Path As String, ByVal Ext As String)
                         rxIndent.Pattern = "^" & matches(0).SubMatches(0)
                 End Select
                 rxIndent.Pattern = rxIndent.Pattern + "\s"
-                '
+
                 ' Skip lines with deeper indentation
                 Do Until InFile.AtEndOfStream
                     txt = InFile.ReadLine
@@ -217,7 +219,7 @@ Public Sub VCS_SanitizeTextFiles(ByVal Path As String, ByVal Ext As String)
                 ' We've moved on at least one line so do get a new one
                 ' when starting the loop again.
                 getLine = False
-            '
+
             ' skip blocks of code matching block pattern
             ElseIf rxBlock.Test(txt) Then
                 Do Until InFile.AtEndOfStream
@@ -243,7 +245,7 @@ Public Sub VCS_SanitizeTextFiles(ByVal Path As String, ByVal Ext As String)
 
         Dim thisFile As Object
         Set thisFile = FSO.GetFile(Path & obj_name & ".sanitize")
-        
+
         ' Error Handling to deal with errors caused by Dropbox, VirusScan,
         ' or anything else touching the file.
         Dim ErrCounter As Integer
@@ -251,7 +253,7 @@ Public Sub VCS_SanitizeTextFiles(ByVal Path As String, ByVal Ext As String)
         thisFile.Move (Path & fileName)
         fileName = Dir$()
     Loop
-    
+
     Exit Sub
 ErrorHandler:
     ErrCounter = ErrCounter + 1
