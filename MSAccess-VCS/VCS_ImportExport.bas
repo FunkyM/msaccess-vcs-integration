@@ -226,215 +226,44 @@ Err_TableNotFound:
 End Sub
 
 
-' Main entry point for IMPORT. Import all forms, reports, queries,
-' macros, modules, and lookup tables from `source` folder under the
-' database's folder.
-Public Sub ImportAllSource()
+' Imports all forms, reports, queries, macros, modules and tables from a path
+Public Sub VCS_ImportAllSources(Optional ByVal sourcePath As String = vbNullString)
     Dim FSO As Object
     Dim source_path As String
-    Dim obj_path As String
-    Dim obj_type As Variant
-    Dim obj_type_split() As String
-    Dim obj_type_label As String
-    Dim obj_type_num As Integer
+    Dim procToCall As String
+    Dim obj As Variant
     Dim obj_count As Integer
-    Dim fileName As String
-    Dim obj_name As String
-    Dim ucs2 As Boolean
+    Dim startTime As Single
 
-    Set FSO = CreateObject("Scripting.FileSystemObject")
+    startTime = Timer
 
     CloseFormsAndReports
 
-    source_path = VCS_Dir.VCS_ProjectPath() & "source\"
+    If sourcePath <> vbNullString Then
+        source_path = sourcePath
+    Else
+        source_path = VCS_Dir.VCS_SourcePath()
+    End If
+
+    Set FSO = CreateObject("Scripting.FileSystemObject")
     If Not FSO.FolderExists(source_path) Then
         MsgBox "No source found at:" & vbCrLf & source_path, vbExclamation, "Import failed"
         Exit Sub
     End If
 
-    Debug.Print
-    
-    If Not VCS_Reference.VCS_ImportReferences(source_path) Then
-        Debug.Print "Info: no references file in " & source_path
-        Debug.Print
-    End If
+    For Each obj In Split("References Queries TableDefinitions Tables Forms Reports Macros Modules Relations")
+        Debug.Print VCS_PadRight("Importing " & obj & "...", 24);
 
-    obj_path = source_path & "queries\"
-    fileName = Dir$(obj_path & "*.bas")
-    
-    Dim tempFilePath As String
-    tempFilePath = VCS_File.VCS_TempFile()
-    
-    If Len(fileName) > 0 Then
-        Debug.Print VCS_String.VCS_PadRight("Importing queries...", 24);
-        obj_count = 0
-        Do Until Len(fileName) = 0
-            DoEvents
-            obj_name = Mid$(fileName, 1, InStrRev(fileName, ".") - 1)
-            VCS_IE_Functions.VCS_ImportObject acQuery, obj_name, obj_path & fileName, VCS_File.VCS_UsingUcs2
-            VCS_IE_Functions.VCS_ExportObject acQuery, obj_name, tempFilePath, VCS_File.VCS_UsingUcs2
-            VCS_IE_Functions.VCS_ImportObject acQuery, obj_name, tempFilePath, VCS_File.VCS_UsingUcs2
-            obj_count = obj_count + 1
-            fileName = Dir$()
-        Loop
-        Debug.Print "[" & obj_count & "]"
-    End If
-    
-    VCS_Dir.VCS_DelIfExist tempFilePath
+        procToCall = "VCS_Import" & obj & "FromPath"
 
-    ' restore table definitions
-    obj_path = source_path & "tbldef\"
-    fileName = Dir$(obj_path & "*.xml")
-    If Len(fileName) > 0 Then
-        Debug.Print VCS_String.VCS_PadRight("Importing tabledefs...", 24);
-        obj_count = 0
-        Do Until Len(fileName) = 0
-            obj_name = Mid$(fileName, 1, InStrRev(fileName, ".") - 1)
-            If DebugOutput Then
-                If obj_count = 0 Then
-                    Debug.Print
-                End If
-                Debug.Print "  [debug] table " & obj_name;
-                Debug.Print
-            End If
-            VCS_Table.VCS_ImportTableDef CStr(obj_name), obj_path
-            obj_count = obj_count + 1
-            fileName = Dir$()
-        Loop
-        Debug.Print "[" & obj_count & "]"
-    End If
-    
-    
-    ' restore linked tables - we must have access to the remote store to import these!
-    fileName = Dir$(obj_path & "*.LNKD")
-    If Len(fileName) > 0 Then
-        Debug.Print VCS_String.VCS_PadRight("Importing Linked tabledefs...", 24);
-        obj_count = 0
-        Do Until Len(fileName) = 0
-            obj_name = Mid$(fileName, 1, InStrRev(fileName, ".") - 1)
-            If DebugOutput Then
-                If obj_count = 0 Then
-                    Debug.Print
-                End If
-                Debug.Print "  [debug] table " & obj_name;
-                Debug.Print
-            End If
-            VCS_Table.VCS_ImportLinkedTable CStr(obj_name), obj_path
-            obj_count = obj_count + 1
-            fileName = Dir$()
-        Loop
-        Debug.Print "[" & obj_count & "]"
-    End If
-    
-    
-    
-    ' NOW we may load data
-    obj_path = source_path & "tables\"
-    fileName = Dir$(obj_path & "*.txt")
-    If Len(fileName) > 0 Then
-        Debug.Print VCS_String.VCS_PadRight("Importing tables...", 24);
-        obj_count = 0
-        Do Until Len(fileName) = 0
-            DoEvents
-            obj_name = Mid$(fileName, 1, InStrRev(fileName, ".") - 1)
-            VCS_Table.VCS_ImportTableData CStr(obj_name), obj_path
-            obj_count = obj_count + 1
-            fileName = Dir$()
-        Loop
-        Debug.Print "[" & obj_count & "]"
-    End If
-    
-    'load Data Macros - not DRY!
-    obj_path = source_path & "tbldef\"
-    fileName = Dir$(obj_path & "*.dm")
-    If Len(fileName) > 0 Then
-        Debug.Print VCS_String.VCS_PadRight("Importing Data Macros...", 24);
-        obj_count = 0
-        Do Until Len(fileName) = 0
-            DoEvents
-            obj_name = Mid$(fileName, 1, InStrRev(fileName, ".") - 1)
-            'VCS_Table.VCS_ImportTableData CStr(obj_name), obj_path
-            VCS_DataMacro.VCS_ImportDataMacros obj_name, obj_path
-            obj_count = obj_count + 1
-            fileName = Dir$()
-        Loop
-        Debug.Print "[" & obj_count & "]"
-    End If
-    
+        obj_count = Application.Run(procToCall, source_path)
 
-        'import Data Macros
-    
-
-    For Each obj_type In Split( _
-        "forms|" & acForm & "," & _
-        "reports|" & acReport & "," & _
-        "macros|" & acMacro & "," & _
-        "modules|" & acModule _
-        , "," _
-    )
-        obj_type_split = Split(obj_type, "|")
-        obj_type_label = obj_type_split(0)
-        obj_type_num = Val(obj_type_split(1))
-        obj_path = source_path & obj_type_label & "\"
-         
-            
-        fileName = Dir$(obj_path & "*.bas")
-        If Len(fileName) > 0 Then
-            Debug.Print VCS_String.VCS_PadRight("Importing " & obj_type_label & "...", 24);
-            obj_count = 0
-            Do Until Len(fileName) = 0
-                ' DoEvents no good idea!
-                obj_name = Mid$(fileName, 1, InStrRev(fileName, ".") - 1)
-                If obj_type_label = "modules" Then
-                    ucs2 = False
-                Else
-                    ucs2 = VCS_File.VCS_UsingUcs2
-                End If
-                If IsNotVCS(obj_name) Then
-                    VCS_IE_Functions.VCS_ImportObject obj_type_num, obj_name, obj_path & fileName, ucs2
-                    obj_count = obj_count + 1
-                Else
-                    If ArchiveMyself Then
-                            MsgBox "Module " & obj_name & " could not be updated while running. Ensure latest version is included!", vbExclamation, "Warning"
-                    End If
-                End If
-                fileName = Dir$()
-            Loop
-            Debug.Print "[" & obj_count & "]"
-        
-        End If
+        Debug.Print "[" & obj_count & "]"
     Next
-    
-    'import Print Variables
-    Debug.Print VCS_String.VCS_PadRight("Importing Print Vars...", 24);
-    obj_count = 0
-    
-    obj_path = source_path & "reports\"
-    fileName = Dir$(obj_path & "*.pv")
-    Do Until Len(fileName) = 0
-        DoEvents
-        obj_name = Mid$(fileName, 1, InStrRev(fileName, ".") - 1)
-        VCS_Report.VCS_ImportPrintVars obj_name, obj_path & fileName
-        obj_count = obj_count + 1
-        fileName = Dir$()
-    Loop
-    Debug.Print "[" & obj_count & "]"
-    
-    'import relations
-    Debug.Print VCS_String.VCS_PadRight("Importing Relations...", 24);
-    obj_count = 0
-    obj_path = source_path & "relations\"
-    fileName = Dir$(obj_path & "*.txt")
-    Do Until Len(fileName) = 0
-        DoEvents
-        VCS_Relation.VCS_ImportRelation obj_path & fileName
-        obj_count = obj_count + 1
-        fileName = Dir$()
-    Loop
-    Debug.Print "[" & obj_count & "]"
+
     DoEvents
-    
-    Debug.Print "Done."
+
+    Debug.Print "Done. (" & GetElapsedTime(startTime) & ")"
 End Sub
 
 ' Imports all sources from a path and drops all objects
