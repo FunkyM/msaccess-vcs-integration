@@ -218,3 +218,45 @@ Public Function VCS_TempFile(Optional ByVal sPrefix As String = "VBA") As String
     If nRet <> 0 Then sFileName = Left$(sTmpName, InStr(sTmpName, vbNullChar) - 1)
     VCS_TempFile = sFileName
 End Function
+
+Private Function GetObjectNameNonPathChars() As Variant
+    ' "/\:=,|<>+?*
+    GetObjectNameNonPathChars = Array(34, 47, 92, 58, 61, 44, 124, 60, 62, 43, 63, 42)
+End Function
+
+' Encode object name string into a path name
+' The resulting string shall be usable in filenames safely
+Public Function VCS_ObjectNameToPathName(ByVal strName As String) As String
+    Dim i As Integer
+    Dim repChars As Variant
+    Dim replacement As String
+
+    repChars = GetObjectNameNonPathChars()
+
+    For i = 0 To UBound(repChars)
+        replacement = "%" & Right$("0" & Hex$(repChars(i)), 2)
+        If InStr(strName, Chr$(repChars(i))) Then
+            strName = Replace(strName, Chr$(repChars(i)), replacement, 1)
+        End If
+    Next i
+
+    VCS_ObjectNameToPathName = strName
+End Function
+
+' Decode an object name string from a path name
+Public Function VCS_PathNameToObjectName(ByVal strName As String) As String
+    Dim i As Integer
+    Dim repChars As Variant
+    Dim needle As String
+
+    repChars = GetObjectNameNonPathChars()
+
+    For i = 0 To UBound(repChars)
+        needle = "%" & Right$("0" & Hex$(repChars(i)), 2)
+        If InStr(strName, needle) Then
+            strName = Replace(strName, needle, Chr$(repChars(i)), 1)
+        End If
+    Next i
+
+    VCS_PathNameToObjectName = strName
+End Function
