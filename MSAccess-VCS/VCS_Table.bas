@@ -193,20 +193,20 @@ Err_LinkedTable:
     Resume Err_LinkedTable_Fin
 End Sub
 
-' Save a Table Definition as SQL statement
-Public Sub VCS_ExportTableDef(ByVal TableName As String, ByVal directory As String)
-    Dim fileName As String
-    fileName = directory & TableName & ".xml"
-    
-    Application.ExportXML _
-    ObjectType:=acExportTable, _
-    DataSource:=TableName, _
-    SchemaTarget:=fileName
-    
-    'exort Data Macros
-    VCS_DataMacro.VCS_ExportDataMacros TableName, directory
+' Import Table Definition from XML
+Public Sub VCS_ImportTableDef(ByVal tblName As String, ByVal directory As String)
+    Application.ImportXML _
+        DataSource:=directory & tblName & ".xml", _
+        ImportOptions:=acStructureOnly
 End Sub
 
+' Save a Table Definition as XML
+Public Sub VCS_ExportTableDef(ByVal tblName As String, ByVal directory As String)
+    Application.ExportXML _
+        ObjectType:=acExportTable, _
+        DataSource:=tblName, _
+        SchemaTarget:=directory & tblName & ".xml"
+End Sub
 
 ' Determine if a table or exists.
 ' based on sample code of support.microsoftcom
@@ -380,16 +380,7 @@ Err_LinkPK_Fin:
     InFile.Close
 End Sub
 
-' Import Table Definition
-Public Sub VCS_ImportTableDef(ByVal tblName As String, ByVal directory As String)
-    Dim filePath As String
-    
-    filePath = directory & tblName & ".xml"
-    Application.ImportXML DataSource:=filePath, ImportOptions:=acStructureOnly
-
-End Sub
-
-' Import the lookup table `tblName` from `source\tables`.
+' Import the table `tblName` from `source\tables`
 Public Sub VCS_ImportTableData(ByVal tblName As String, ByVal obj_path As String)
     Dim Db As Object ' DAO.Database
     Dim rs As Object ' DAO.Recordset
