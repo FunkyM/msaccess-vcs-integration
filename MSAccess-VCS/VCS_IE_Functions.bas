@@ -78,6 +78,25 @@ Public Function VCS_ObjectPath(ByVal strPath As String, ByVal strObjectType As S
     VCS_ObjectPath = strPath & VCS_ObjectPath
 End Function
 
+Public Function VCS_GetAccessTypeForObjectType(ByVal objType As String) As Integer
+    Select Case objType
+        Case "Query"
+            VCS_GetAccessTypeForObjectType = acQuery
+        Case "Form"
+            VCS_GetAccessTypeForObjectType = acForm
+        Case "Report"
+            VCS_GetAccessTypeForObjectType = acReport
+        Case "Macro"
+            VCS_GetAccessTypeForObjectType = acMacro
+        Case "Module"
+            VCS_GetAccessTypeForObjectType = acModule
+        Case "TableDataMacro"
+            VCS_GetAccessTypeForObjectType = acTableDataMacro
+        Case "DatabaseProperties"
+            VCS_GetAccessTypeForObjectType = acDatabaseProperties
+    End Select
+End Function
+
 Public Function VCS_ShouldHandleUcs2Conversion(ByVal objType As String) As Boolean
     If _
         VCS_UsingUcs2() And _
