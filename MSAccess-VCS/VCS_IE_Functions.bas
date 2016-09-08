@@ -97,6 +97,21 @@ Public Function VCS_GetAccessTypeForObjectType(ByVal objType As String) As Integ
     End Select
 End Function
 
+Public Function VCS_GetContainerNameForObjectType(ByVal objType As String) As String
+    Select Case objType
+        Case "Form"
+            VCS_GetContainerNameForObjectType = "Forms"
+        Case "Report"
+            VCS_GetContainerNameForObjectType = "Reports"
+        Case "Macro"
+            VCS_GetContainerNameForObjectType = "Scripts"
+        Case "Module"
+            VCS_GetContainerNameForObjectType = "Modules"
+        Case Else
+            VCS_GetContainerNameForObjectType = ""
+    End Select
+End Function
+
 Public Function VCS_ShouldHandleUcs2Conversion(ByVal objType As String) As Boolean
     If _
         VCS_UsingUcs2() And _
