@@ -233,6 +233,15 @@ Public Sub VCS_DeleteObjects(ByVal objType As String)
     End Select
 End Sub
 
+' Sanitizes files for an object type within a directory
+Public Sub VCS_SanitizeFilesForObjectTypeAtPath(ByVal objType As String, ByVal strPath As String)
+    Select Case objType
+        ' Form Specification Syntax
+        Case "Query", "Form", "Report", "Macro"
+            VCS_SanitizeTextFiles VCS_AppendDirectoryDelimiter(strPath), VCS_GetObjectFileExtension(objType)
+    End Select
+End Sub
+
 ' For each *.`ext` in `Path`, find and remove a number of problematic but
 ' unnecessary lines of VB code that are inserted automatically by the
 ' Access GUI and change often (we don't want these lines of code in
