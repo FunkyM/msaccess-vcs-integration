@@ -4,39 +4,6 @@ Option Compare Database
 Option Private Module
 Option Explicit
 
-' For Access 2007 (VBA6) and earlier
-#If Not VBA7 Then
-  Private Const acTableDataMacro As Integer = 12
-#End If
-
-Public Sub VCS_ExportDataMacros(ByVal tableName As String, ByVal directory As String)
-    On Error GoTo Err_export
-    Dim filePath As String
-
-    filePath = directory & tableName & ".dm"
-
-    VCS_IE_Functions.VCS_ExportObject acTableDataMacro, tableName, filePath, VCS_File.VCS_UsingUcs2
-    VCS_FormatXMLDataMacroFile filePath
-
-    Exit Sub
-
-Err_export:
-    ' Error to export dataMacro, no contains dataMacro. Do nothing
-End Sub
-
-Public Sub VCS_ImportDataMacros(ByVal tableName As String, ByVal directory As String)
-    On Error GoTo Err_import
-    Dim filePath As String
-
-    filePath = directory & tableName & ".dm"
-    VCS_IE_Functions.VCS_ImportObject acTableDataMacro, tableName, filePath, VCS_File.VCS_UsingUcs2
-
-    Exit Sub
-
-Err_import:
-    ' Error to import dataMacro. Do nothing
-End Sub
-
 ' Splits exported DataMacro XML into multiple lines
 ' This allows a VCS to find changes within lines using diff
 Public Sub VCS_FormatXMLDataMacroFile(ByVal filePath As String)
