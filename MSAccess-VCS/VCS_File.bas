@@ -44,7 +44,6 @@ Private Type BinFile
     mode As String
 End Type
 
-
 ' --------------------------------
 ' Basic functions missing from VB 6: buffered file read/write, string builder, encoding check & conversion
 ' --------------------------------
@@ -126,7 +125,6 @@ Private Sub BinClose(ByRef f As BinFile)
     End If
     Close f.file_num
 End Sub
-
 
 ' Binary convert a UCS2-little-endian encoded file to UTF-8.
 Public Sub VCS_ConvertUcs2Utf8(ByVal Source As String, ByVal dest As String)
@@ -214,7 +212,7 @@ Public Function VCS_TempFile(Optional ByVal sPrefix As String = "VBA") As String
     Dim sTmpName As String * 576
     Dim nRet As Long
     Dim sFileName As String
-    
+
     nRet = getTempPath(512, sTmpPath)
     nRet = getTempFileName(sTmpPath, sPrefix, 0, sTmpName)
     If nRet <> 0 Then sFileName = Left$(sTmpName, InStr(sTmpName, vbNullChar) - 1)
