@@ -8,22 +8,24 @@ Option Explicit
 
 
 
-Public Sub VCS_ExportLinkedTable(ByVal tbl_name As String, ByVal obj_path As String)
+Public Sub VCS_ExportLinkedTable(ByVal tbl_name As String, ByVal fileName As String)
     On Error GoTo Err_LinkedTable
-    
-    Dim tempFilePath As String
-    
-    tempFilePath = VCS_File.VCS_TempFile()
-    
+
+    Dim workFileName As String
     Dim FSO As Object
     Dim OutFile As Object
 
     Set FSO = CreateObject("Scripting.FileSystemObject")
-    ' open file for writing with Create=True, Unicode=True (USC-2 Little Endian format)
-    VCS_Dir.VCS_MkDirIfNotExist obj_path
-    
-    Set OutFile = FSO.CreateTextFile(tempFilePath, overwrite:=True, Unicode:=True)
-    
+
+    If VCS_ShouldHandleUcs2Conversion("LinkedTable") Then
+        workFileName = VCS_File.VCS_TempFile()
+    Else
+        workFileName = fileName
+    End If
+
+    ' Open file for writing with Create=True, Unicode=True (USC-2 Little Endian format)
+    Set OutFile = FSO.CreateTextFile(workFileName, overwrite:=True, Unicode:=True)
+
     OutFile.Write CurrentDb.TableDefs(tbl_name).name
     OutFile.Write vbCrLf
 
@@ -57,9 +59,12 @@ Public Sub VCS_ExportLinkedTable(ByVal tbl_name As String, ByVal obj_path As Str
 Err_LinkedTable_Fin:
     On Error Resume Next
     OutFile.Close
-    'save files as .odbc
-    VCS_File.VCS_ConvertUcs2Utf8 tempFilePath, obj_path & tbl_name & ".LNKD"
-    
+
+    If VCS_ShouldHandleUcs2Conversion("LinkedTable") Then
+        ' Save files as .odbc
+        VCS_File.VCS_ConvertUcs2Utf8 workFileName, fileName
+    End If
+
     Exit Sub
 
 Err_LinkedTable:
@@ -179,21 +184,25 @@ Public Sub VCS_ExportTableData(ByVal tbl_name As String, ByVal obj_path As Strin
     FSO.DeleteFile tempFileName
 End Sub
 
-Public Sub VCS_ImportLinkedTable(ByVal tblName As String, ByRef obj_path As String)
+Public Sub VCS_ImportLinkedTable(ByVal tblName As String, ByVal fileName As String)
+    Dim workFileName As String
     Dim Db As DAO.Database
     Dim FSO As Object
     Dim InFile As Object
-    
-    Set Db = CurrentDb
+
+    Set Db = CurrentDb()
     Set FSO = CreateObject("Scripting.FileSystemObject")
-    
-    Dim tempFilePath As String
-    tempFilePath = VCS_File.VCS_TempFile()
-    
-    VCS_ConvertUtf8Ucs2 obj_path & tblName & ".LNKD", tempFilePath
+
+    If VCS_ShouldHandleUcs2Conversion("LinkedTable") Then
+        workFileName = VCS_File.VCS_TempFile()
+        VCS_ConvertUtf8Ucs2 fileName, workFileName
+    Else
+        workFileName = fileName
+    End If
+
     ' open file for reading with Create=False, Unicode=True (USC-2 Little Endian format)
-    Set InFile = FSO.OpenTextFile(tempFilePath, iomode:=ForReading, create:=False, Format:=TristateTrue)
-    
+    Set InFile = FSO.OpenTextFile(workFileName, iomode:=ForReading, create:=False, Format:=TristateTrue)
+
     On Error GoTo err_notable:
     DoCmd.DeleteObject acTable, tblName
 
@@ -243,8 +252,9 @@ Err_CreateLinkedTable_Fin:
     sql = Left$(sql, Len(sql) - 1)
 
     sql = sql & ") WITH PRIMARY"
-    CurrentDb.Execute sql
-    
+
+    Db.Execute sql
+
 Err_LinkPK_Fin:
     On Error Resume Next
     InFile.Close
