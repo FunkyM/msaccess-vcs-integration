@@ -19,6 +19,10 @@ Private Const ArchiveMyself As Boolean = False
 ' Not required for git
 Public Const ConvertUcs2ToUtf8 As Boolean = True
 
+Private Function GetElapsedTime(ByVal startTime As Single) As String
+    GetElapsedTime = Round(Timer - startTime, 2) & " seconds"
+End Function
+
 ' Returns true if named module is NOT part of the VCS code
 Public Function IsNotVCS(ByVal name As String) As Boolean
     If _
