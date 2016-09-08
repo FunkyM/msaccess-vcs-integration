@@ -109,38 +109,8 @@ Private Function TableExists(ByVal TName As String) As Boolean
     
     ' Reset the error variable.
     Err = 0
-    
+
     TableExists = Found
-End Function
-
-' Build SQL to export `tbl_name` sorted by each field from first to last
-Private Function TableExportSql(ByVal tbl_name As String) As String
-    Dim rs As Object
-    Dim fieldObj As Object
-    Dim sb As String, Count As Integer
-
-    Set rs = CurrentDb.OpenRecordset(tbl_name)
-
-    sb = "SELECT "
-
-    Count = 0
-    For Each fieldObj In rs.Fields
-        If Count > 0 Then sb = sb & ", "
-        sb = sb & "[" & fieldObj.name & "]"
-        Count = Count + 1
-    Next
-
-    sb = sb & " FROM [" & tbl_name & "] ORDER BY "
-
-    Count = 0
-    For Each fieldObj In rs.Fields
-        DoEvents
-        If Count > 0 Then sb = sb & ", "
-        sb = sb & "[" & fieldObj.name & "]"
-        Count = Count + 1
-    Next
-
-    TableExportSql = sb
 End Function
 
 ' Export the lookup table `tblName` to `source\tables`.
@@ -156,8 +126,8 @@ Public Sub VCS_ExportTableData(ByVal tbl_name As String, ByVal obj_path As Strin
         Debug.Print "Error: Table " & tbl_name & " missing"
         Exit Sub
     End If
-    
-    Set rs = CurrentDb.OpenRecordset(TableExportSql(tbl_name))
+
+    Set rs = CurrentDb.OpenRecordset("SELECT * FROM " & tbl_name)
     If rs.RecordCount = 0 Then
         'why is this an error? Debug.Print "Error: Table " & tbl_name & "  empty"
         rs.Close
