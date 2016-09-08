@@ -3,16 +3,15 @@ Option Compare Database
 
 Option Explicit
 
-' List of lookup tables that are part of the program rather than the
-' data, to be exported with source code
-' Set to "*" to export the contents of all tables
-'Only used in ExportAllSource
-Private Const INCLUDE_TABLES As String = ""
-' This is used in ImportAllSource
-Private Const DebugOutput As Boolean = False
-'this is used in ExportAllSource
-'Causes the VCS_ code to be exported
-Private Const ArchiveMyself As Boolean = False
+' Comma seperated list of specific tables to process with their data.
+' Set to "*" to import/export contents of all tables.
+Public Const IncludeTables As String = "*"
+
+' Enables extended debug output to the immediate window
+Public Const DebugOutput As Boolean = False
+
+' Determines if VCS_ modules are to to be exported, too
+Public Const ArchiveMyself As Boolean = False
 
 ' Converts UCS-2 LE encoded sources to UTF-8 automatically
 ' Useful since some version control systems treat UCS-2 encoded files as binary
