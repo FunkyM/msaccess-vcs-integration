@@ -36,6 +36,7 @@ Fin_DirCheck:
     Do Until Len(fileName) = 0
         ' Strip file type from file name
         fileName = Left$(fileName, InStrRev(fileName, ".bas") - 1)
+        Debug.Print "Deleting " & fileName & "..."
         DoCmd.DeleteObject acModule, fileName
         fileName = Dir$()
     Loop
@@ -58,6 +59,7 @@ Fin_DelHandler:
     Do Until Len(fileName) = 0
         ' Strip file type from file name
         fileName = Left$(fileName, InStrRev(fileName, ".bas") - 1)
+        Debug.Print "Loading " & fileName & "..."
         Application.LoadFromText acModule, fileName, SourceDirectory & fileName & ".bas"
         fileName = Dir$()
     Loop
