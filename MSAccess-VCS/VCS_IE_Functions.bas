@@ -274,7 +274,7 @@ Public Sub VCS_SaveAccessTypeAsText(ByVal objType As String, ByVal objName As St
 
     ' Format XML tags of data macro XML file into multiple lines for easier versioning
     If objType = "TableDataMacro" Then
-        VCS_FormatXMLDataMacroFile fileName
+        VCS_FormatXMLFile fileName
     End If
 
     Exit Sub
