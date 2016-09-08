@@ -124,6 +124,7 @@ Private Sub SetPrtDevModeForReport(ByRef rpt As Report, ByRef vars As type_DEVMO
     Dim DevModeExtra As String
 
     ' Write print vars back into report
+    DevModeExtra = rpt.PrtDevMode
     LSet DevModeString = vars
     Mid(DevModeExtra, 1, 94) = DevModeString.RGB
     rpt.PrtDevMode = DevModeExtra
