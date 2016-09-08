@@ -16,6 +16,35 @@ Private Const StripPublishOption As Boolean = True
 Public Const ForReading = 1, ForWriting = 2, ForAppending = 8
 Public Const TristateTrue = -1, TristateFalse = 0, TristateUseDefault = -2
 
+' Returns a path to store files for a specific object type
+Public Function VCS_ObjectPath(ByVal strPath As String, ByVal strObjectType As String) As String
+    Select Case strObjectType
+        Case "TableDefinition", "LinkedTable", "TableDataMacro"
+            VCS_ObjectPath = "tbldef"
+        Case "Table"
+            VCS_ObjectPath = "tables"
+        Case "Report", "PrintVars"
+            VCS_ObjectPath = "reports"
+        Case "Macro"
+            VCS_ObjectPath = "macros"
+        Case "Module"
+            VCS_ObjectPath = "modules"
+        Case "Query"
+            VCS_ObjectPath = "queries"
+        Case "Relation"
+            VCS_ObjectPath = "relations"
+        Case "Form"
+            VCS_ObjectPath = "forms"
+        Case "References"
+            VCS_ObjectPath = "\"
+        Case "DatabaseProperties"
+            VCS_ObjectPath = "\"
+        Case Else
+            VCS_ObjectPath = ""
+    End Select
+    VCS_ObjectPath = strPath & VCS_ObjectPath
+End Function
+
 Public Function VCS_ShouldHandleUcs2Conversion(ByVal objType As String) As Boolean
     If _
         VCS_UsingUcs2() And _
