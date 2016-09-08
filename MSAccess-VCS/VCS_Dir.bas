@@ -4,7 +4,6 @@ Option Compare Database
 Option Private Module
 Option Explicit
 
-
 ' Path/Directory of the current database file.
 Public Function VCS_ProjectPath() As String
     VCS_ProjectPath = CurrentProject.Path
@@ -13,6 +12,16 @@ End Function
 
 Public Function VCS_SourcePath() As String
     VCS_SourcePath = VCS_ProjectPath() & CurrentProject.Name & ".src\"
+End Function
+
+Public Function VCS_AppendDirectoryDelimiter(ByVal Path As String) As String
+    If Mid(Path, Len(Path), 1) = "\" Then
+        VCS_AppendDirectoryDelimiter = Path
+        Exit Function
+    Else
+        VCS_AppendDirectoryDelimiter = Path & "\"
+        Exit Function
+    End If
 End Function
 
 ' Create folder `Path`. Silently do nothing if it already exists.
