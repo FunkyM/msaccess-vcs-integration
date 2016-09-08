@@ -16,6 +16,39 @@ Private Const StripPublishOption As Boolean = True
 Public Const ForReading = 1, ForWriting = 2, ForAppending = 8
 Public Const TristateTrue = -1, TristateFalse = 0, TristateUseDefault = -2
 
+' Returns the file extension for an object type
+' See https://msdn.microsoft.com/en-us/library/aa241721(v=vs.60).aspx
+Public Function VCS_GetObjectFileExtension(ByVal objType As String) As String
+    Select Case objType
+        Case "Reference"
+            VCS_GetObjectFileExtension = "csv"
+        Case "Query"
+            VCS_GetObjectFileExtension = "bas"
+        Case "Table"
+            VCS_GetObjectFileExtension = "xml"
+        Case "TableDefinition"
+            VCS_GetObjectFileExtension = "xsd"
+        Case "LinkedTable"
+            VCS_GetObjectFileExtension = "lnkd"
+        Case "TableDataMacro"
+            VCS_GetObjectFileExtension = "xml"
+        Case "Form"
+            VCS_GetObjectFileExtension = "bas"
+        Case "Report"
+            VCS_GetObjectFileExtension = "bas"
+        Case "Macro"
+            VCS_GetObjectFileExtension = "bas"
+        Case "Module"
+            VCS_GetObjectFileExtension = "bas"
+        Case "Relation"
+            VCS_GetObjectFileExtension = "txt"
+        Case "PrintVars"
+            VCS_GetObjectFileExtension = "txt"
+        Case "DatabaseProperties"
+            VCS_GetObjectFileExtension = "txt"
+    End Select
+End Function
+
 ' Returns a path to store files for a specific object type
 Public Function VCS_ObjectPath(ByVal strPath As String, ByVal strObjectType As String) As String
     Select Case strObjectType
