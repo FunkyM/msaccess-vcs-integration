@@ -156,8 +156,8 @@ Public Sub VCS_ConvertUcs2Utf8(ByVal Source As String, ByVal dest As String)
         End If
     Loop
 
-    BinClose f_in
     BinClose f_out
+    BinClose f_in
 End Sub
 
 ' Binary convert a UTF-8 encoded file to UCS2-little-endian.
@@ -191,8 +191,8 @@ Public Sub VCS_ConvertUtf8Ucs2(ByVal Source As String, ByVal dest As String)
         End If
     Loop
 
-    BinClose f_in
     BinClose f_out
+    BinClose f_in
 End Sub
 
 ' Determine if this database imports/exports code as UCS-2-LE. (Older file
