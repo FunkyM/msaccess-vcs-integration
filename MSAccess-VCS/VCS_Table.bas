@@ -115,33 +115,32 @@ End Function
 
 ' Build SQL to export `tbl_name` sorted by each field from first to last
 Private Function TableExportSql(ByVal tbl_name As String) As String
-    Dim rs As Object ' DAO.Recordset
-    Dim fieldObj As Object ' DAO.Field
-    Dim sb() As String, Count As Integer
+    Dim rs As Object
+    Dim fieldObj As Object
+    Dim sb As String, Count As Integer
 
     Set rs = CurrentDb.OpenRecordset(tbl_name)
-    
-    sb = VCS_String.VCS_Sb_Init()
-    VCS_String.VCS_Sb_Append sb, "SELECT "
-    
+
+    sb = "SELECT "
+
     Count = 0
     For Each fieldObj In rs.Fields
-        If Count > 0 Then VCS_String.VCS_Sb_Append sb, ", "
-        VCS_String.VCS_Sb_Append sb, "[" & fieldObj.name & "]"
+        If Count > 0 Then sb = sb & ", "
+        sb = sb & "[" & fieldObj.name & "]"
         Count = Count + 1
     Next
-    
-    VCS_String.VCS_Sb_Append sb, " FROM [" & tbl_name & "] ORDER BY "
-    
+
+    sb = sb & " FROM [" & tbl_name & "] ORDER BY "
+
     Count = 0
     For Each fieldObj In rs.Fields
         DoEvents
-        If Count > 0 Then VCS_String.VCS_Sb_Append sb, ", "
-        VCS_String.VCS_Sb_Append sb, "[" & fieldObj.name & "]"
+        If Count > 0 Then sb = sb & ", "
+        sb = sb & "[" & fieldObj.name & "]"
         Count = Count + 1
     Next
 
-    TableExportSql = VCS_String.VCS_Sb_Get(sb)
+    TableExportSql = sb
 End Function
 
 ' Export the lookup table `tblName` to `source\tables`.
