@@ -104,11 +104,10 @@ End Sub
 
 ' Imports all forms, reports, queries, macros, modules and tables from a path
 Public Sub VCS_ImportAllSources(Optional ByVal sourcePath As String = vbNullString)
+    Dim importPath As String
     Dim FSO As Object
-    Dim source_path As String
-    Dim procToCall As String
-    Dim obj As Variant
-    Dim obj_count As Integer
+    Dim objType As Variant
+    Dim objCount As Integer
     Dim startTime As Single
 
     startTime = Timer
@@ -116,30 +115,28 @@ Public Sub VCS_ImportAllSources(Optional ByVal sourcePath As String = vbNullStri
     CloseFormsAndReports
 
     If sourcePath <> vbNullString Then
-        source_path = sourcePath
+        importPath = sourcePath
     Else
-        source_path = VCS_Dir.VCS_SourcePath()
+        importPath = VCS_Dir.VCS_SourcePath()
     End If
 
     Set FSO = CreateObject("Scripting.FileSystemObject")
-    If Not FSO.FolderExists(source_path) Then
-        MsgBox "No source found at:" & vbCrLf & source_path, vbExclamation, "Import failed"
+    If Not FSO.FolderExists(importPath) Then
+        MsgBox "No source found at:" & vbCrLf & importPath, vbExclamation, "Import failed"
         Exit Sub
     End If
 
-    For Each obj In Split("References Queries TableDefinitions Tables Forms Reports Macros Modules Relations")
-        Debug.Print VCS_PadRight("Importing " & obj & "...", 24);
+    VCS_Debug "> Import Starting."
 
-        procToCall = "VCS_Import" & obj & "FromPath"
-
-        obj_count = Application.Run(procToCall, source_path)
-
-        Debug.Print "[" & obj_count & "]"
+    For Each objType In Split("Reference Query Table Form Report Macro Module Relation")
+        VCS_Debug VCS_PadRight("Importing " & objType & " Objects...", 32), withNewLine:=False
+        objCount = VCS_ImportObjects(objType, importPath)
+        VCS_Debug "Done (" & objCount & ")"
     Next
 
     DoEvents
 
-    Debug.Print "Done. (" & GetElapsedTime(startTime) & ")"
+    VCS_Debug "> Import Finished. (" & GetElapsedTime(startTime) & ")"
 End Sub
 
 ' Imports all sources from a path and drops all objects
