@@ -382,9 +382,9 @@ End Sub
 
 ' Import the table `tblName` from `source\tables`
 Public Sub VCS_ImportTableData(ByVal tblName As String, ByVal obj_path As String)
-    Dim Db As Object ' DAO.Database
-    Dim rs As Object ' DAO.Recordset
-    Dim fieldObj As Object ' DAO.Field
+    Dim Db As Object
+    Dim rs As Object
+    Dim fieldObj As Object
     Dim FSO As Object
     Dim InFile As Object
     Dim c As Long, buf As String, Values() As String, Value As Variant
