@@ -267,7 +267,7 @@ Public Sub VCS_ImportAllSources(Optional ByVal sourcePath As String = vbNullStri
 End Sub
 
 ' Imports all sources from a path and drops all objects
-Public Sub VCS_ImportProject(Optional ByVal prompt As Boolean = True)
+Public Sub VCS_ImportProject(Optional ByVal sourcePath As String = vbNullString, Optional ByVal prompt As Boolean = True)
     On Error GoTo errorHandler
 
     If _
@@ -297,8 +297,9 @@ Public Sub VCS_ImportProject(Optional ByVal prompt As Boolean = True)
 
     Debug.Print "================="
     Debug.Print "Importing Project"
-    ImportAllSource
-    
+
+    VCS_ImportAllSources sourcePath
+
     Exit Sub
 
 errorHandler:
