@@ -4,6 +4,11 @@ Option Compare Database
 Option Private Module
 Option Explicit
 
+' For Access 2007 (VBA6) and earlier
+#If Not VBA7 Then
+    Private Const acTableDataMacro As Integer = 12
+#End If
+
 #If VBA7 Then
     Private Declare PtrSafe Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
 #Else

@@ -45,12 +45,8 @@ Public Function IsNotVCS(ByVal name As String) As Boolean
       name <> "VCS_DataMacro" And _
       name <> "VCS_Dir" And _
       name <> "VCS_File" And _
-      name <> "VCS_Form" And _
       name <> "VCS_IE_Functions" And _
       name <> "VCS_ImportExport" And _
-      name <> "VCS_Macro" And _
-      name <> "VCS_Module" And _
-      name <> "VCS_Query" And _
       name <> "VCS_Reference" And _
       name <> "VCS_Relation" And _
       name <> "VCS_Report" And _
