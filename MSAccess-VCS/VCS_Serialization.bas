@@ -1,4 +1,4 @@
-Attribute VB_Name = "VCS_IE_Functions"
+Attribute VB_Name = "VCS_Serialization"
 Option Compare Database
 
 Option Private Module
