@@ -5,7 +5,7 @@ Option Private Module
 Option Explicit
 
 ' Imports References from a path
-Public Function VCS_ImportReferencesFromPath(ByVal fileName As String) As Integer
+Public Function VCS_LoadReferencesFromText(ByVal fileName As String) As Integer
     Dim FSO As Object
     Dim InFile As Object
     Dim line As String
@@ -17,7 +17,7 @@ Public Function VCS_ImportReferencesFromPath(ByVal fileName As String) As Intege
 
     refName = Dir$(fileName)
     If Len(refName) = 0 Then
-        VCS_ImportReferencesFromPath = 0
+        VCS_LoadReferencesFromText = 0
         Exit Function
     End If
 
@@ -34,11 +34,11 @@ Public Function VCS_ImportReferencesFromPath(ByVal fileName As String) As Intege
           Major = CLng(item(1))
           Minor = CLng(item(2))
           Application.References.AddFromGuid GUID, Major, Minor
-          VCS_ImportReferencesFromPath = VCS_ImportReferencesFromPath + 1
+          VCS_LoadReferencesFromText = VCS_LoadReferencesFromText + 1
         Else
           refName = Trim$(item(0))
           Application.References.AddFromFile refName
-          VCS_ImportReferencesFromPath = VCS_ImportReferencesFromPath + 1
+          VCS_LoadReferencesFromText = VCS_LoadReferencesFromText + 1
         End If
 go_on:
     Loop
@@ -61,7 +61,7 @@ failed_guid:
 End Function
 
 ' Export References to a path
-Public Function VCS_ExportReferencesToPath(ByVal fileName As String) As Integer
+Public Function VCS_SaveReferencesAsText(ByVal fileName As String) As Integer
     Dim FSO As Object
     Dim OutFile As Object
     Dim line As String
@@ -69,18 +69,18 @@ Public Function VCS_ExportReferencesToPath(ByVal fileName As String) As Integer
 
     Set FSO = CreateObject("Scripting.FileSystemObject")
     Set OutFile = FSO.CreateTextFile(fileName, overwrite:=True, Unicode:=False)
-    VCS_ExportReferencesToPath = 0
+    VCS_SaveReferencesAsText = 0
     For Each ref In Application.References
         If ref.GUID <> vbNullString Then ' references of types mdb,accdb,mde etc don't have a GUID
             If Not ref.BuiltIn Then
                 line = ref.GUID & "," & CStr(ref.Major) & "," & CStr(ref.Minor)
                 OutFile.WriteLine line
-                VCS_ExportReferencesToPath = VCS_ExportReferencesToPath + 1
+                VCS_SaveReferencesAsText = VCS_SaveReferencesAsText + 1
             End If
         Else
             line = ref.FullPath
             OutFile.WriteLine line
-            VCS_ExportReferencesToPath = VCS_ExportReferencesToPath + 1
+            VCS_SaveReferencesAsText = VCS_SaveReferencesAsText + 1
         End If
     Next
     OutFile.Close

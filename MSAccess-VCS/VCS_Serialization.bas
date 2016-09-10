@@ -170,10 +170,6 @@ Public Sub VCS_LoadTableDefinitionFromText(ByVal objName As String, ByVal fileNa
         ImportOptions := acStructureOnly
 End Sub
 
-Public Sub VCS_LoadReferencesFromText(ByVal fileName As String)
-    VCS_ImportReferencesFromPath(fileName)
-End Sub
-
 Public Sub VCS_LoadRelationFromText(ByVal fileName As String)
     VCS_ImportRelation(fileName)
 End Sub
@@ -304,10 +300,6 @@ Public Sub VCS_SaveTableDefinitionAsText(ByVal objName As String, ByVal fileName
         ObjectType := acExportTable, _
         DataSource := objName, _
         SchemaTarget := fileName
-End Sub
-
-Public Sub VCS_SaveReferencesAsText(ByVal fileName As String)
-    VCS_ExportReferencesToPath(fileName)
 End Sub
 
 Public Sub VCS_SaveRelationAsText(ByVal objName As String, ByVal fileName As String)
