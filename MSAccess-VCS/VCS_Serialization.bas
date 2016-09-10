@@ -504,7 +504,7 @@ Public Sub VCS_DeleteObjects(ByVal objType As String)
                 Then
                     If _
                         objType <> "Module" Or _
-                        (objType = "Module" And IsNotVCS(doc.name)) _
+                        (objType = "Module" And VCS_ImportExport.IsNotVCS(doc.name)) _
                     Then
                         DoCmd.DeleteObject VCS_GetAccessTypeForObjectType(objType), doc.name
                     End If
