@@ -4,11 +4,16 @@ Option Compare Database
 Option Private Module
 Option Explicit
 
-Public Sub VCS_ExportRelation(ByVal rel As DAO.Relation, ByVal filePath As String)
+Public Sub VCS_SaveRelationAsText(ByVal objName As String, ByVal filePath As String)
+    Dim dbSource As Object
     Dim FSO As Object
     Dim OutFile As Object
     Set FSO = CreateObject("Scripting.FileSystemObject")
     Set OutFile = FSO.CreateTextFile(filePath, overwrite:=True, Unicode:=False)
+    Dim rel As DAO.Relation
+
+    Set dbSource = CurrentDb()
+    Set rel = dbSource.Relations(objName)
 
     OutFile.WriteLine rel.Attributes ' RelationAttributeEnum
     OutFile.WriteLine rel.name
@@ -26,7 +31,7 @@ Public Sub VCS_ExportRelation(ByVal rel As DAO.Relation, ByVal filePath As Strin
     OutFile.Close
 End Sub
 
-Public Sub VCS_ImportRelation(ByVal filePath As String)
+Public Sub VCS_LoadRelationFromText(ByVal filePath As String)
     Dim FSO As Object
     Dim InFile As Object
     Set FSO = CreateObject("Scripting.FileSystemObject")
@@ -47,7 +52,7 @@ Public Sub VCS_ImportRelation(ByVal filePath As String)
             f.ForeignName = InFile.ReadLine
             If "End" <> InFile.ReadLine Then
                 Set f = Nothing
-                Err.Raise 40000, "VCS_ImportRelation", "Missing 'End' for a 'Begin' in " & filePath
+                Err.Raise 40000, "VCS_LoadRelationFromText", "Missing 'End' for a 'Begin' in " & filePath
             End If
             rel.Fields.Append f
         End If

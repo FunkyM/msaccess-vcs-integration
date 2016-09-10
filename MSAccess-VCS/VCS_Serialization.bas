@@ -170,10 +170,6 @@ Public Sub VCS_LoadTableDefinitionFromText(ByVal objName As String, ByVal fileNa
         ImportOptions := acStructureOnly
 End Sub
 
-Public Sub VCS_LoadRelationFromText(ByVal fileName As String)
-    VCS_ImportRelation(fileName)
-End Sub
-
 Public Sub VCS_LoadFromText(ByVal objType As String, ByVal objName As String, ByVal fileName As String)
     If Not VCS_FileExists(fileName) Then Exit Sub
 
@@ -300,16 +296,6 @@ Public Sub VCS_SaveTableDefinitionAsText(ByVal objName As String, ByVal fileName
         ObjectType := acExportTable, _
         DataSource := objName, _
         SchemaTarget := fileName
-End Sub
-
-Public Sub VCS_SaveRelationAsText(ByVal objName As String, ByVal fileName As String)
-    Dim dbSource As Object
-    Dim rel As DAO.Relation
-
-    Set dbSource = CurrentDb()
-    Set rel = dbSource.Relations(objName)
-
-    VCS_ExportRelation rel, fileName
 End Sub
 
 Public Sub VCS_SaveAsText(ByVal objType As String, ByVal objName As String, ByVal fileName As String)
