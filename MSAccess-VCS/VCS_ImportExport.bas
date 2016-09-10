@@ -44,7 +44,7 @@ Public Function IsNotVCS(ByVal name As String) As Boolean
     If _
       name <> "VCS_Dir" And _
       name <> "VCS_File" And _
-      name <> "VCS_IE_Functions" And _
+      name <> "VCS_Serialization" And _
       name <> "VCS_ImportExport" And _
       name <> "VCS_Reference" And _
       name <> "VCS_Relation" And _
