@@ -210,7 +210,7 @@ Public Function VCS_ImportObjects(ByVal objType As String, ByVal strPath As Stri
         Case "Reference"
             VCS_ImportObject objType, "references", objPath
             VCS_ImportObjects = VCS_ImportObjects + 1
-        Case "Query", "Table", "Form", "Report", "Macro", "Relation", "Module"
+        Case "Query", "Table", "LinkedTable", "Form", "Report", "Macro", "Relation", "Module"
             fileName = Dir$(VCS_AppendDirectoryDelimiter(objPath) & "*." & VCS_GetObjectFileExtension(objType))
             Do Until Len(fileName) = 0
                 objName = VCS_PathNameToObjectName(Mid$(fileName, 1, InStrRev(fileName, ".") - 1))

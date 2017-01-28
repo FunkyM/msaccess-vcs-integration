@@ -123,7 +123,7 @@ Public Sub VCS_ImportAllSources(Optional ByVal sourcePath As String = vbNullStri
 
     VCS_Debug "> Import Starting."
 
-    For Each objType In Split("Reference Query Table Form Report Macro Module Relation")
+    For Each objType In Split("Reference Query LinkedTable Table Form Report Macro Module Relation")
         VCS_Debug VCS_PadRight("Importing " & objType & " Objects...", 32), withNewLine:=False
         objCount = VCS_ImportObjects(objType, importPath)
         VCS_Debug "Done (" & objCount & ")"
